@@ -38,10 +38,10 @@ changed and when.
 
 ## Open Decisions
 
-- Whether to address old git history: earlier commits still contain the
-  previous, now-superseded wording (explicit robots.txt/Terms of Use
-  discussion) that was rewritten out of the current docs. Rewriting
-  history would require a force-push and hasn't been requested or done.
+- None currently open. (Old git history containing the now-superseded
+  robots.txt/Terms of Use wording was reviewed and deliberately left
+  as-is — no real supermarket name/URL was ever in it, and rewriting
+  would require a destructive force-push for marginal benefit.)
 
 ## Next Steps
 

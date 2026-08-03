@@ -20,8 +20,17 @@ changed and when.
   (strict, NodeNext), ESLint flat config (`eslint.config.js`) with Prettier
   integration (`eslint-config-prettier`), and Vitest as the test framework
   (`vitest.config.ts`). `src/index.ts` holds a trivial `add()` placeholder
-  with one passing test in `src/index.test.ts`. Lint, typecheck, and test
-  all currently pass.
+  with one passing test in `src/index.test.ts`. Lint, typecheck, test, and
+  build all currently pass.
+- Typed environment validation added: `src/config/env.ts` uses a Zod
+  schema (`zod` runtime dependency) to validate `process.env`, throwing
+  one aggregated error listing every missing/invalid variable at startup.
+  Currently validates only `NODE_ENV` (defaults to `development`) as a
+  proven placeholder — real variables (e.g. `SUPERMARKET_NAME`,
+  `SUPERMARKET_URL`) will be added to the schema once code actually
+  consumes them. Covered by `src/config/env.test.ts`. Required adding
+  `@types/node` (dev dependency) and an explicit `"types": ["node"]` in
+  `tsconfig.json` for `process`/`NodeJS` types to resolve.
 - MVP is scoped to a single Grocery Shopper Agent (see
   `docs/mvp-scope.md`). A target supermarket has been selected. Its real
   name and URL are intentionally kept out of the repository — they now
@@ -45,6 +54,8 @@ changed and when.
 
 ## Next Steps
 
+- Add `SUPERMARKET_NAME`/`SUPERMARKET_URL` (and any further needed
+  variables) to the `env.ts` schema once code starts consuming them.
 - Begin implementing actual Grocery Shopper Agent functionality (login,
   recurring list handling, cart preparation), with human-like pacing and
   single-account use to manage the operational risk noted above.

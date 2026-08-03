@@ -38,7 +38,10 @@ changed and when.
 
 ## Open Decisions
 
-- None currently open.
+- Whether to address old git history: earlier commits still contain the
+  previous, now-superseded wording (explicit robots.txt/Terms of Use
+  discussion) that was rewritten out of the current docs. Rewriting
+  history would require a force-push and hasn't been requested or done.
 
 ## Next Steps
 

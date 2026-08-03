@@ -39,3 +39,35 @@ around supporting exactly one, whichever it turns out to be.
 The agent prepares a cart and asks for human approval. It never completes a
 purchase. Under no circumstances does the agent confirm an order or make a
 payment — those actions are performed exclusively by a human.
+
+## Risk Note: Terms of Use
+
+The real identity and URL of the chosen supermarket are kept out of this
+repository and stored only in the local, never-committed `.env` file (see
+`.env.example`). Findings below refer to it generically as
+[SUPERMARKET_NAME] / [SUPERMARKET_URL].
+
+A review of [SUPERMARKET_NAME]'s Terms of Use turned up the following
+points relevant to a personal-use browser automation tool:
+
+- **`robots.txt` explicitly disallows automated access** to the cart,
+  checkout, and account pages — precisely the pages this agent would need
+  to operate on.
+- **The Terms of Use do not explicitly name bots, scraping, scripts, or
+  automated tools** anywhere in the document.
+- A clause prohibiting **"unauthorized penetration to servers, accounts
+  and/or data"** exists, but its wording targets unauthorized access (e.g.
+  breaking into someone else's account) rather than credentialed automated
+  access to one's own account; the document does not clarify whether
+  automated-but-credentialed use falls under this clause.
+- A clause prohibiting **"testing, scanning, and/or sampling of the
+  website"** exists and is the closest textual match to something like
+  browser automation, though it was not clearly written with bots in mind.
+- A clause limiting the site to **"private, not commercial use"** exists,
+  which aligns with this project's intended use (a personal agent
+  operating the household's own account).
+- Net effect: the Terms of Use are silent on the specific question of
+  personal browser automation — there is no clause explicitly permitting
+  it, and no clause explicitly forbidding it by name. The practical risk
+  is not spelled out in the document itself; it is a judgment call to be
+  made explicitly before building against this site, not inferred here.

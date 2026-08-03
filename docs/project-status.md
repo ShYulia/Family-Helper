@@ -14,11 +14,12 @@ changed and when.
 - Project scaffolding in place: `README.md`, `CLAUDE.md`, `.gitignore`,
   `.env.example`.
 - MVP is scoped to a single Grocery Shopper Agent (see
-  `docs/mvp-scope.md`). A target supermarket has been selected, but its
-  real name and URL are intentionally kept out of the repository — they
-  will live only in a local, never-committed `.env` file (not yet
-  created). The repo continues to refer to it only as
-  `[SUPERMARKET_NAME]` / `[SUPERMARKET_URL]`.
+  `docs/mvp-scope.md`). A target supermarket has been selected. Its real
+  name and URL are intentionally kept out of the repository — they now
+  live only in a local, never-committed `.env` file (created; keys
+  `SUPERMARKET_NAME` and `SUPERMARKET_URL`). `.env.example` documents
+  those key names with empty values. The repo continues to refer to the
+  supermarket only as `[SUPERMARKET_NAME]` / `[SUPERMARKET_URL]`.
 - A Terms of Use risk review for the selected supermarket was completed
   and documented in `docs/mvp-scope.md` under "Risk Note: Terms of Use".
   Summary: `robots.txt` disallows automated access to cart/checkout/account
@@ -35,7 +36,5 @@ changed and when.
 ## Next Steps
 
 - Decide whether to proceed given the Terms of Use risk note.
-- Create the local `.env` file with the real supermarket name/URL (not
-  committed).
 - Begin scaffolding the TypeScript/Node.js project once the above is
   resolved.

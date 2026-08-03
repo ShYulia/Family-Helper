@@ -7,12 +7,20 @@ changed and when.
 
 ## Current State
 
-- Project setup only. No application code has been written yet.
+- Project setup only. No Grocery Shopper Agent application code has been
+  written yet — only scaffolding and one trivial placeholder function.
 - Repository: https://github.com/ShYulia/Family-Helper (private).
 - Docs in place: `docs/product-vision.md`, `docs/mvp-scope.md`,
   `docs/project-status.md`.
 - Project scaffolding in place: `README.md`, `CLAUDE.md`, `.gitignore`,
   `.env.example`.
+- TypeScript/Node.js project initialized: `package.json` (ESM, Node 20+,
+  `build`/`dev`/`lint`/`format`/`typecheck`/`test` scripts), `tsconfig.json`
+  (strict, NodeNext), ESLint flat config (`eslint.config.js`) with Prettier
+  integration (`eslint-config-prettier`), and Vitest as the test framework
+  (`vitest.config.ts`). `src/index.ts` holds a trivial `add()` placeholder
+  with one passing test in `src/index.test.ts`. Lint, typecheck, and test
+  all currently pass.
 - MVP is scoped to a single Grocery Shopper Agent (see
   `docs/mvp-scope.md`). A target supermarket has been selected. Its real
   name and URL are intentionally kept out of the repository — they now
@@ -36,5 +44,5 @@ changed and when.
 ## Next Steps
 
 - Decide whether to proceed given the Terms of Use risk note.
-- Begin scaffolding the TypeScript/Node.js project once the above is
-  resolved.
+- Begin implementing actual Grocery Shopper Agent functionality (login,
+  recurring list handling, cart preparation) once the above is resolved.

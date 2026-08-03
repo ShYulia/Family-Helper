@@ -30,19 +30,19 @@ changed and when.
   supermarket only as `[SUPERMARKET_NAME]` / `[SUPERMARKET_URL]`.
 - A Terms of Use risk review for the selected supermarket was completed
   and documented in `docs/mvp-scope.md` under "Risk Note: Terms of Use".
-  Summary: `robots.txt` disallows automated access to cart/checkout/account
-  pages; the Terms of Use don't name bots/scraping explicitly but contain
-  ambiguous clauses on unauthorized access and site "testing/scanning".
-  No final go/no-go decision has been made on this risk yet.
+  **Decision: proceed**, subject to the Non-Negotiable Safety Rule (no
+  automated checkout/payment). The primary identified project risk is
+  operational (rate-limiting/account flagging by the supermarket's own
+  systems), to be mitigated through implementation choices rather than
+  treated as a reason to halt. See the "Decision" subsection in
+  `docs/mvp-scope.md` for full reasoning.
 
 ## Open Decisions
 
-- Whether to accept the Terms of Use risk for the selected supermarket and
-  proceed, given the `robots.txt` disallow on cart/checkout/account pages
-  (see `docs/mvp-scope.md` risk note).
+- None currently open.
 
 ## Next Steps
 
-- Decide whether to proceed given the Terms of Use risk note.
 - Begin implementing actual Grocery Shopper Agent functionality (login,
-  recurring list handling, cart preparation) once the above is resolved.
+  recurring list handling, cart preparation), with human-like pacing and
+  single-account use to manage the operational risk noted above.

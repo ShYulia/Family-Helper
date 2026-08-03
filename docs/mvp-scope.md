@@ -71,3 +71,24 @@ points relevant to a personal-use browser automation tool:
   it, and no clause explicitly forbidding it by name. The practical risk
   is not spelled out in the document itself; it is a judgment call to be
   made explicitly before building against this site, not inferred here.
+
+### Decision
+
+**Proceed**, subject to the Non-Negotiable Safety Rule above (no automated
+checkout, no automated payment). Reasoning:
+
+- The intended use — a personal agent operating the household's own
+  account, with no resale or redistribution — matches the site's stated
+  "private, not commercial use" clause.
+- The `robots.txt` disallow on cart/checkout/account pages is standard
+  e-commerce boilerplate aimed at search-engine crawlers indexing
+  session-specific pages; it is not treated here as a signal specifically
+  targeted at personal automation tools.
+- The primary identified project risk is **operational**, not addressed by
+  this document as a legal conclusion: automated-looking traffic could be
+  rate-limited or the account could be flagged/suspended by the
+  supermarket's own systems. This should be mitigated through
+  implementation choices (human-like pacing, single account, no scale),
+  not treated as a reason to halt.
+- This decision applies to v1 as scoped. It should be revisited if scope,
+  scale, or the target supermarket changes.

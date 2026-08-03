@@ -40,55 +40,31 @@ The agent prepares a cart and asks for human approval. It never completes a
 purchase. Under no circumstances does the agent confirm an order or make a
 payment — those actions are performed exclusively by a human.
 
-## Risk Note: Terms of Use
+## Operational Considerations
 
 The real identity and URL of the chosen supermarket are kept out of this
 repository and stored only in the local, never-committed `.env` file (see
-`.env.example`). Findings below refer to it generically as
-[SUPERMARKET_NAME] / [SUPERMARKET_URL].
+`.env.example`). This document and the rest of the public repository refer
+to it generically as [SUPERMARKET_NAME] / [SUPERMARKET_URL], and no
+site-specific implementation details (selectors, DOM structure, fixtures,
+screenshots) are committed either — see `CLAUDE.md` for this as a standing
+rule.
 
-A review of [SUPERMARKET_NAME]'s Terms of Use turned up the following
-points relevant to a personal-use browser automation tool:
+Building browser automation against a live retail website introduces a
+few engineering assumptions and risks worth stating explicitly:
 
-- **`robots.txt` explicitly disallows automated access** to the cart,
-  checkout, and account pages — precisely the pages this agent would need
-  to operate on.
-- **The Terms of Use do not explicitly name bots, scraping, scripts, or
-  automated tools** anywhere in the document.
-- A clause prohibiting **"unauthorized penetration to servers, accounts
-  and/or data"** exists, but its wording targets unauthorized access (e.g.
-  breaking into someone else's account) rather than credentialed automated
-  access to one's own account; the document does not clarify whether
-  automated-but-credentialed use falls under this clause.
-- A clause prohibiting **"testing, scanning, and/or sampling of the
-  website"** exists and is the closest textual match to something like
-  browser automation, though it was not clearly written with bots in mind.
-- A clause limiting the site to **"private, not commercial use"** exists,
-  which aligns with this project's intended use (a personal agent
-  operating the household's own account).
-- Net effect: the Terms of Use are silent on the specific question of
-  personal browser automation — there is no clause explicitly permitting
-  it, and no clause explicitly forbidding it by name. The practical risk
-  is not spelled out in the document itself; it is a judgment call to be
-  made explicitly before building against this site, not inferred here.
-
-### Decision
-
-**Proceed**, subject to the Non-Negotiable Safety Rule above (no automated
-checkout, no automated payment). Reasoning:
-
-- The intended use — a personal agent operating the household's own
-  account, with no resale or redistribution — matches the site's stated
-  "private, not commercial use" clause.
-- The `robots.txt` disallow on cart/checkout/account pages is standard
-  e-commerce boilerplate aimed at search-engine crawlers indexing
-  session-specific pages; it is not treated here as a signal specifically
-  targeted at personal automation tools.
-- The primary identified project risk is **operational**, not addressed by
-  this document as a legal conclusion: automated-looking traffic could be
-  rate-limited or the account could be flagged/suspended by the
-  supermarket's own systems. This should be mitigated through
-  implementation choices (human-like pacing, single account, no scale),
-  not treated as a reason to halt.
-- This decision applies to v1 as scoped. It should be revisited if scope,
-  scale, or the target supermarket changes.
+- **Assumption:** the agent operates a single household's own account,
+  using credentials the household controls, for personal, non-commercial
+  use only.
+- **Dependency:** the target site's markup, login flow, and cart behavior
+  are external and outside this project's control, and may change without
+  notice — the automation layer will need ongoing maintenance to track
+  such changes.
+- **Operational risk:** automated browsing patterns can be detected by a
+  site's own systems (rate-limiting, bot-detection, account flagging).
+  This is treated as an engineering constraint to design around — e.g.
+  human-like request pacing and single-account, non-scaled operation —
+  rather than a legal question to resolve here.
+- **Primary mitigation:** the Non-Negotiable Safety Rule above bounds the
+  impact of any of the above — the agent never completes a purchase, so
+  its effect is limited to preparing a cart for human review.

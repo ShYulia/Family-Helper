@@ -9,7 +9,8 @@ changed and when.
 
 - Project setup only. No Grocery Shopper Agent application code has been
   written yet — only scaffolding and one trivial placeholder function.
-- Repository: https://github.com/ShYulia/Family-Helper (private).
+- Repository: https://github.com/ShYulia/Family-Helper (public — kept
+  implementation-agnostic; see `CLAUDE.md` "Public Repository Discipline").
 - Docs in place: `docs/product-vision.md`, `docs/mvp-scope.md`,
   `docs/project-status.md`.
 - Project scaffolding in place: `README.md`, `CLAUDE.md`, `.gitignore`,
@@ -28,14 +29,12 @@ changed and when.
   `SUPERMARKET_NAME` and `SUPERMARKET_URL`). `.env.example` documents
   those key names with empty values. The repo continues to refer to the
   supermarket only as `[SUPERMARKET_NAME]` / `[SUPERMARKET_URL]`.
-- A Terms of Use risk review for the selected supermarket was completed
-  and documented in `docs/mvp-scope.md` under "Risk Note: Terms of Use".
-  **Decision: proceed**, subject to the Non-Negotiable Safety Rule (no
-  automated checkout/payment). The primary identified project risk is
-  operational (rate-limiting/account flagging by the supermarket's own
-  systems), to be mitigated through implementation choices rather than
-  treated as a reason to halt. See the "Decision" subsection in
-  `docs/mvp-scope.md` for full reasoning.
+- Engineering assumptions and risks for automating against a live retail
+  site are documented in `docs/mvp-scope.md` under "Operational
+  Considerations" — target-specific config stays local-only, and
+  automated-traffic detection is treated as an engineering constraint to
+  design around (human-like pacing, single-account operation), bounded by
+  the Non-Negotiable Safety Rule.
 
 ## Open Decisions
 

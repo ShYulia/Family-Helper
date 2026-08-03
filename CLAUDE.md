@@ -14,6 +14,19 @@ This is a living document; it will be extended later.
   payment automatically, under any circumstance. This is a hard safety
   rule, not a preference.
 
+## Public Repository Discipline
+
+This repository is public. Treat it as implementation-agnostic:
+
+- Never commit the real supermarket name, URLs, CSS selectors, DOM
+  structure, screenshots, fixtures, or any other implementation detail
+  that identifies a specific target supermarket.
+- Keep all supermarket-specific configuration local only, via `.env` or
+  other gitignored local files.
+- Public docs and code should read as architecture, engineering, and
+  browser-automation technique — not as a discussion of a specific
+  retailer or its policies.
+
 ## Before Making Changes
 
 - Read the relevant files under `docs/` first, including

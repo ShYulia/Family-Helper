@@ -16,9 +16,18 @@ This is a living document; it will be extended later.
 
 ## Before Making Changes
 
-- Read the relevant files under `docs/` first.
+- Read the relevant files under `docs/` first, including
+  `docs/project-status.md` for the current state, open decisions, and next
+  steps.
 - When a task touches more than one file, summarize the plan before editing.
 - Reference `docs/mvp-scope.md` as the current scope boundary.
+
+## End of Session
+
+- After a session that produces meaningful changes, update
+  `docs/project-status.md` to reflect current state, open decisions, and
+  next steps. Keep it a snapshot, not a changelog — git history already
+  covers what changed.
 
 ## How to Make Changes
 

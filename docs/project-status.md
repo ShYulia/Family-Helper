@@ -12,7 +12,7 @@ changed and when.
 - Repository: https://github.com/ShYulia/Family-Helper (public — kept
   implementation-agnostic; see `CLAUDE.md` "Public Repository Discipline").
 - Docs in place: `docs/product-vision.md`, `docs/mvp-scope.md`,
-  `docs/project-status.md`.
+  `docs/decision-engine-architecture.md`, `docs/project-status.md`.
 - Project scaffolding in place: `README.md`, `CLAUDE.md`, `.gitignore`,
   `.env.example`.
 - TypeScript/Node.js project initialized: `package.json` (ESM, Node 20+,
@@ -44,6 +44,89 @@ changed and when.
   automated-traffic detection is treated as an engineering constraint to
   design around (human-like pacing, single-account operation), bounded by
   the Non-Negotiable Safety Rule.
+- Grocery Shopper Agent domain model added: `src/domain/` (Zod schemas,
+  runtime-validated, matching the `env.ts` pattern), one file per concept,
+  barrel-exported via `src/domain/index.ts`. Modeled as four layers with a
+  one-way dependency — Intent → Catalog → Decision → History, plus a
+  separate Execution contract:
+  - **Intent** (`recurring-item.ts`) — `RecurringItem`, `ItemPreferences`,
+    `DecisionWeights`, `RecurrenceRule`. Represents a shopping _need_
+    (e.g. "milk, weekly, prefer organic"), not a specific product/SKU.
+    Created and owned entirely by the user.
+  - **Catalog** (`product-offer.ts`) — `ProductOffer`, `Promotion`. A
+    snapshot of a real product on the target site (price, unit price,
+    availability, promotion, brand, dietary tags). Pure observed fact,
+    produced by the browser automation layer, with no opinions in it.
+  - **Decision** (`purchase-decision.ts`) — `PurchaseDecision`. The AI
+    decision engine's output: which offer to buy, how many, and a
+    human-readable `reasoning` trail. This is the only thing the
+    automation layer is allowed to consume.
+  - **History** (`purchase-history.ts`) — `PurchaseHistoryEntry`. Records
+    whether a human kept, swapped, or removed a past decision. Not
+    consumed by anything yet — a stable shape for a future
+    learned-preferences feature.
+  - **Execution** (`cart-automation.ts`) — `CartAction`,
+    `CartActionResult`, `CartAutomation`. The narrow interface the
+    browser automation layer implements (`siteProductId` + `quantity` in,
+    success/failure + observed price out). Deliberately contains no
+    price/brand/preference logic, so business logic can never leak into
+    the automation layer.
+  - `shared.ts` holds cross-layer primitives (`Unit`, `Quantity`,
+    `Priority`, `DietaryTag`).
+  - Every schema/type carries a structured doc comment (What / Why /
+    Layer / Who / Example) — written as learning material as well as
+    documentation, per explicit request.
+  - Since extended with `decision-result.ts` (`DecisionResult`, the
+    `'decided' | 'no-match'` union — lets the engine say "nothing here is
+    acceptable" as a typed outcome instead of a thrown error or a
+    fabricated decision) and `decision-engine.ts` (`DecisionEngineInput`,
+    `DecisionEngine` — the contract a future orchestrator calls; plain
+    TypeScript interfaces, not Zod, matching `CartAutomation`'s
+    behavioral-contract precedent).
+- AI Decision Engine architecture designed and agreed:
+  `docs/decision-engine-architecture.md` — a two-phase pipeline (hard
+  filter, then weighted soft scoring), a hard-vs-soft table for how each
+  `ItemPreferences` field is applied, the scoring formula, how
+  human-readable `reasoning` is generated, and an evolution path from
+  today's rule-based engine to a future hybrid/LLM-assisted one without
+  changing the `DecisionEngine` interface.
+- AI Decision Engine implemented per that design, in `src/decision-engine/`
+  (barrel-exported via `src/decision-engine/index.ts`), built and tested
+  piece by piece:
+  - `units.ts` — `convertAmount` (g↔kg, ml↔l; throws across dimensions)
+    and `unitsNeededToCover` (how many packages satisfy a need).
+  - `hard-filters.ts` — `applyHardFilters` implements the architecture
+    doc's hard/soft table: unavailable, excluded-brand, missing-required-
+    dietary-tag, and over-`maxPrice` offers are always removed;
+    `maxUnitPrice` is skipped (not rejected) when an offer lacks a unit
+    price; `preferredBrands` only becomes a hard filter when
+    `substitutionAllowed === false`. Missing dietary data fails an offer
+    closed (safety-leaning); missing unit-price data just skips that one
+    check — a deliberate asymmetry, noted in code comments.
+  - `scoring.ts` — `resolveWeights` (item overrides onto household
+    defaults) and `scoreCandidates` (per-factor `[0,1]` scores normalized
+    _within the candidate set_, combined into a weighted average). A
+    preference the household never stated never penalizes or rewards a
+    candidate — that factor is simply omitted from the average.
+    `dietaryMatch` is implemented but currently vestigial: since `dietary`
+    is a hard requirement, every surviving candidate already satisfies it
+    100%, so this factor always contributes a constant 1.0 today — flagged
+    as the same schema gap the architecture doc already calls out (no
+    separate "soft dietary preference" field yet).
+  - `reasoning.ts` — `explainDecision` turns the top (up to 4)
+    positive-contributing factors into human-readable lines (e.g. "60%
+    cheaper than the average of the other options"), falling back to a
+    generic explanation if nothing stood out; `summarizeNoMatchReasons`
+    categorizes hard-filter rejection reasons (pattern-matched on their
+    text — coupled to `hard-filters.ts`'s exact wording) into one summary
+    for the `no-match` case.
+  - `engine.ts` — `RuleBasedDecisionEngine implements DecisionEngine`,
+    composing all of the above: filter → resolve weights → score → rank
+    (ties broken deterministically by `siteProductId`) → compute quantity
+    → explain → validate the result through `decisionResultSchema.parse`
+    before returning.
+  - 97 tests passing across the whole project (up from 37); typecheck and
+    lint clean throughout.
 
 ## Open Decisions
 
@@ -54,8 +137,21 @@ changed and when.
 
 ## Next Steps
 
-- Add `SUPERMARKET_NAME`/`SUPERMARKET_URL` (and any further needed
-  variables) to the `env.ts` schema once code starts consuming them.
-- Begin implementing actual Grocery Shopper Agent functionality (login,
-  recurring list handling, cart preparation), with human-like pacing and
-  single-account use to manage the operational risk noted above.
+- Build the orchestrator that wires everything together: for each active
+  `RecurringItem`, call the browser automation layer to search
+  (`searchTerms` → `ProductOffer[]`), pass the result to
+  `RuleBasedDecisionEngine.decide`, and turn a `'decided'` result into
+  `CartAction`s (or flag a `'no-match'` for human review). Sketched in
+  `docs/decision-engine-architecture.md` §7, not built yet.
+- Decide how `RecurringItem`s are persisted (e.g. a local JSON file) —
+  not yet built; the domain model and decision engine exist independently
+  of storage.
+- Build the browser automation layer implementing `CartAutomation`
+  against the real target site (login, search, add-to-cart), with
+  human-like pacing and single-account use to manage the operational risk
+  noted above. It should only ever consume `CartAction`s — never
+  preferences or scoring logic.
+- Revisit two flagged gaps when they start to matter in practice: the
+  `dietaryMatch` scoring factor is currently a no-op (see above), and
+  `summarizeNoMatchReasons` is coupled to `hard-filters.ts`'s exact reason
+  text rather than a structured reason code.

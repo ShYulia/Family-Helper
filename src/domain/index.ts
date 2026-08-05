@@ -6,3 +6,4 @@ export * from './decision-result.js';
 export * from './purchase-history.js';
 export * from './cart-automation.js';
 export * from './decision-engine.js';
+export * from './product-search.js';

@@ -127,6 +127,38 @@ changed and when.
     before returning.
   - 97 tests passing across the whole project (up from 37); typecheck and
     lint clean throughout.
+- `RecurringItem` persistence added: `src/storage/recurring-item-store.ts`
+  — `loadRecurringItems`/`saveRecurringItems` read/write a local JSON file
+  as UTF-8, validated through the domain schema on both load (rejects a
+  corrupted file with a clear error) and save (a bug elsewhere can never
+  write invalid data to disk). Returns `[]` if the file doesn't exist yet,
+  rather than throwing. Household data is personal, not architecture, so
+  `/data/` is gitignored; `data/recurring-items.example.json` documents
+  the shape, mirroring `.env.example`. Round-trips non-Latin text
+  (tested with Hebrew) since the target site's language is Hebrew and
+  free-text fields are plain `z.string()` — no special handling needed.
+- Orchestrator added: `src/orchestration/orchestrator.ts` —
+  `runShoppingRun(items, deps)` implements the loop sketched in
+  `docs/decision-engine-architecture.md` §7: for each _active_
+  `RecurringItem`, search for candidates, ask
+  `RuleBasedDecisionEngine.decide`, and sort the outcome into
+  `cartActions` (ready for a future `CartAutomation.addToCart`) or
+  `needsReview` (the `'no-match'` results, for a human). It does not call
+  `addToCart` itself — that stays a separate step for whenever a real
+  `CartAutomation` exists.
+  - New domain contract: `src/domain/product-search.ts` —
+    `ProductSearch` (`search(searchTerms) -> ProductOffer[]`), the mirror
+    image of `CartAutomation`: the boundary the browser automation layer
+    will implement to produce candidates, instead of just consuming
+    decisions.
+  - Since there's no real browser automation yet, `src/orchestration/dev-fixtures.ts`
+    provides a small, realistic stand-in for development: 4
+    `RecurringItem`s (milk, eggs, olive oil, gluten-free bread) covering
+    promotions, package-size preference, a weighted brand preference, and
+    a hard dietary filter, plus a `FakeProductSearch` returning canned
+    `ProductOffer`s for them. Explicitly not production code — swapped
+    for a real `ProductSearch` implementation later.
+  - 109 tests passing across the whole project (up from 97).
 
 ## Open Decisions
 
@@ -137,21 +169,23 @@ changed and when.
 
 ## Next Steps
 
-- Build the orchestrator that wires everything together: for each active
-  `RecurringItem`, call the browser automation layer to search
-  (`searchTerms` → `ProductOffer[]`), pass the result to
-  `RuleBasedDecisionEngine.decide`, and turn a `'decided'` result into
-  `CartAction`s (or flag a `'no-match'` for human review). Sketched in
-  `docs/decision-engine-architecture.md` §7, not built yet.
-- Decide how `RecurringItem`s are persisted (e.g. a local JSON file) —
-  not yet built; the domain model and decision engine exist independently
-  of storage.
-- Build the browser automation layer implementing `CartAutomation`
-  against the real target site (login, search, add-to-cart), with
-  human-like pacing and single-account use to manage the operational risk
-  noted above. It should only ever consume `CartAction`s — never
-  preferences or scoring logic.
-- Revisit two flagged gaps when they start to matter in practice: the
-  `dietaryMatch` scoring factor is currently a no-op (see above), and
+- Build the browser automation layer implementing both `ProductSearch`
+  and `CartAutomation` against the real target site (login, search,
+  add-to-cart), with human-like pacing and single-account use to manage
+  the operational risk noted above. It should only ever consume/produce
+  `CartAction`s and `ProductOffer`s — never preferences or scoring logic.
+  Once it exists, `dev-fixtures.ts`'s `FakeProductSearch` is replaced by
+  it, and something needs to call `CartAutomation.addToCart` with the
+  orchestrator's `cartActions` (the orchestrator itself deliberately
+  doesn't call it).
+- The final recurring list should eventually be editable through user
+  commands, not by hand-editing JSON — noted as a future requirement, not
+  built yet. `src/storage/recurring-item-store.ts`'s `load`/`save`
+  functions are the primitive a future command layer would sit on top of.
+- Revisit gaps flagged so far, once they start to matter in practice: the
+  `dietaryMatch` scoring factor is currently a no-op (see above),
   `summarizeNoMatchReasons` is coupled to `hard-filters.ts`'s exact reason
-  text rather than a structured reason code.
+  text rather than a structured reason code, and Hebrew-specific matching
+  concerns (final-letter forms, niqqud, locale-aware sorting) noted when
+  persistence was built but not yet relevant until real site search
+  exists.

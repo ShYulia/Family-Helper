@@ -75,5 +75,43 @@ export const dietaryTagSchema = z.enum([
   'nut-free',
   'kosher',
   'halal',
+  'free-range',
+  'sugar-free',
 ]);
 export type DietaryTag = z.infer<typeof dietaryTagSchema>;
+
+/**
+ * What: How a product is physically packaged — carton, bag, bottle, etc.
+ * Why: Some households have a real preference here (e.g. milk in a carton
+ *   vs. a bag) that has nothing to do with brand, price, or size.
+ * Layer: Shared — a product fact (ProductOffer) and a preference
+ *   (ItemPreferences) can both use the same set of values.
+ * Who: The preference side is set by the user; the fact side is parsed off
+ *   the site by the browser automation layer (usually from the product
+ *   name, since the site doesn't expose it as a separate structured field).
+ * Example: a household prefers milk "in a carton"; a product is packaged
+ *   in a bag instead.
+ */
+export const containerTypeSchema = z.enum([
+  'carton',
+  'bag',
+  'bottle',
+  'jar',
+  'other',
+]);
+export type ContainerType = z.infer<typeof containerTypeSchema>;
+
+/**
+ * What: A standard size grade for graded products (eggs being the
+ *   canonical example on this site) — small/medium/large/extra-large.
+ * Why: For eggs specifically, "size" in the everyday sense (M vs L) is a
+ *   grading label, not a package amount — `Quantity`/`preferredPackageSize`
+ *   already cover pack *count* (e.g. "12 eggs"), which is a separate
+ *   concern from the size of each individual egg.
+ * Layer: Shared — same reasoning as ContainerType above.
+ * Who: Same as ContainerType above.
+ * Example: a household prefers size "M" eggs; a product on the site is
+ *   graded "L".
+ */
+export const sizeGradeSchema = z.enum(['S', 'M', 'L', 'XL']);
+export type SizeGrade = z.infer<typeof sizeGradeSchema>;

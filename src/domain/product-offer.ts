@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { dietaryTagSchema, quantitySchema } from './shared.js';
+import {
+  containerTypeSchema,
+  dietaryTagSchema,
+  quantitySchema,
+  sizeGradeSchema,
+} from './shared.js';
 
 /**
  * What: A discount or special offer currently active on a product.
@@ -48,6 +53,12 @@ export const productOfferSchema = z.object({
   available: z.boolean(),
   promotion: promotionSchema.optional(),
   dietaryTags: z.array(dietaryTagSchema).optional(),
+  // Parsed off the product name where possible (the site doesn't expose
+  // these as separate structured fields) — absent when not detected,
+  // never guessed.
+  fatPercentage: z.number().min(0).max(100).optional(),
+  containerType: containerTypeSchema.optional(),
+  sizeGrade: sizeGradeSchema.optional(),
   fetchedAt: z.iso.datetime(),
 });
 export type ProductOffer = z.infer<typeof productOfferSchema>;

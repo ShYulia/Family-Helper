@@ -1,8 +1,10 @@
 import { z } from 'zod';
 import {
+  containerTypeSchema,
   dietaryTagSchema,
   prioritySchema,
   quantitySchema,
+  sizeGradeSchema,
   unitSchema,
 } from './shared.js';
 
@@ -28,6 +30,9 @@ export const decisionWeightsSchema = z.object({
   brandMatch: z.number().min(0),
   packageSizeFit: z.number().min(0),
   dietaryMatch: z.number().min(0),
+  fatPercentageMatch: z.number().min(0),
+  containerTypeMatch: z.number().min(0),
+  sizeGradeMatch: z.number().min(0),
 });
 export type DecisionWeights = z.infer<typeof decisionWeightsSchema>;
 
@@ -61,6 +66,16 @@ export const itemPreferencesSchema = z.object({
   maxPrice: z.number().positive().optional(),
   preferOnPromotion: z.boolean().optional(),
   substitutionAllowed: z.boolean().optional(),
+  preferredFatPercentage: z.number().min(0).max(100).optional(),
+  preferredContainerType: containerTypeSchema.optional(),
+  preferredSizeGrade: sizeGradeSchema.optional(),
+  // Hard filter, not a scored preference: every keyword here must appear
+  // (case-insensitive substring match) in a candidate's name, or it's
+  // excluded. Exists for cases a search term alone can't narrow down —
+  // e.g. a brand-scoped search returning that brand's whole product line,
+  // where only a name keyword (like "almond") tells one product line
+  // apart from another the household doesn't want substituted in.
+  requiredNameKeywords: z.array(z.string().min(1)).optional(),
   weights: decisionWeightsSchema.partial().optional(),
 });
 export type ItemPreferences = z.infer<typeof itemPreferencesSchema>;

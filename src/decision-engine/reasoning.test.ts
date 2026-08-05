@@ -73,6 +73,9 @@ describe('explainDecision — factor text, via real scoring output', () => {
       brandMatch: 0,
       packageSizeFit: 0,
       dietaryMatch: 0,
+      fatPercentageMatch: 0,
+      containerTypeMatch: 0,
+      sizeGradeMatch: 0,
     };
     const scored = scoreCandidates(candidates, {}, weights);
     const cheapScored = scored.find((s) => s.offer.siteProductId === 'cheap');
@@ -125,6 +128,48 @@ describe('explainDecision — factor text, via real scoring output', () => {
     expect(reasons[0]).toBe(
       'close to your preferred size of 1 l (this is 1 l)',
     );
+  });
+
+  it('names the matched fat percentage', () => {
+    const fattyOffer = offer({ fatPercentage: 3 });
+    const scored: ScoredOffer = {
+      offer: fattyOffer,
+      score: 1,
+      factorScores: [
+        { factor: 'fatPercentageMatch', weight: 1, normalizedScore: 1 },
+      ],
+    };
+    const preferences: ItemPreferences = { preferredFatPercentage: 3 };
+    const reasons = explainDecision(scored, [fattyOffer], preferences);
+    expect(reasons[0]).toBe('matches your preferred fat percentage (3%)');
+  });
+
+  it('names the matched container type', () => {
+    const cartonOffer = offer({ containerType: 'carton' });
+    const scored: ScoredOffer = {
+      offer: cartonOffer,
+      score: 1,
+      factorScores: [
+        { factor: 'containerTypeMatch', weight: 1, normalizedScore: 1 },
+      ],
+    };
+    const preferences: ItemPreferences = { preferredContainerType: 'carton' };
+    const reasons = explainDecision(scored, [cartonOffer], preferences);
+    expect(reasons[0]).toBe('matches your preferred packaging (carton)');
+  });
+
+  it('names the matched size grade', () => {
+    const gradedOffer = offer({ sizeGrade: 'M' });
+    const scored: ScoredOffer = {
+      offer: gradedOffer,
+      score: 1,
+      factorScores: [
+        { factor: 'sizeGradeMatch', weight: 1, normalizedScore: 1 },
+      ],
+    };
+    const preferences: ItemPreferences = { preferredSizeGrade: 'M' };
+    const reasons = explainDecision(scored, [gradedOffer], preferences);
+    expect(reasons[0]).toBe('matches your preferred size grade (M)');
   });
 
   it('lists the matched dietary tags', () => {
@@ -190,6 +235,18 @@ describe('summarizeNoMatchReasons', () => {
     ];
     expect(summarizeNoMatchReasons(rejected)).toBe(
       '3 candidates found; all excluded — all exceed your price limit',
+    );
+  });
+
+  it('categorizes a missing required name keyword', () => {
+    const rejected: RejectedOffer[] = [
+      {
+        offer: offer(),
+        reasons: ['missing required keyword(s) in name: שקדים'],
+      },
+    ];
+    expect(summarizeNoMatchReasons(rejected)).toBe(
+      '1 candidate found; all excluded — none match the required name keywords',
     );
   });
 

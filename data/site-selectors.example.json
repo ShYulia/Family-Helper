@@ -1,0 +1,23 @@
+{
+  "baseUrl": "https://example-supermarket.example",
+  "searchPath": "/search?q={query}",
+  "productPath": "/product/{code}",
+  "currency": "EUR",
+
+  "productTileSelector": ".product-tile",
+  "productCodeAttribute": "data-product-code",
+  "productNameAttribute": "data-product-name",
+  "productPriceAttribute": "data-product-price",
+  "sizeAndBrandSelector": ".product-size-and-brand",
+  "unitPriceSelector": ".product-unit-price",
+  "unitPriceBasisAmount": 100,
+  "promotionSelector": ".product-promotion",
+  "outOfStockSelector": ".product-out-of-stock",
+
+  "buyBoxSelector": ".product-buy-box",
+  "addToCartButtonSelector": ".add-to-cart-button",
+  "updateCartButtonSelector": ".update-cart-button",
+  "quantityInputSelector": ".quantity-input",
+  "priceSelector": ".price",
+  "productPageTitleSelector": "h1.product-title"
+}

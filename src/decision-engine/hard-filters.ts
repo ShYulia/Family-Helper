@@ -90,5 +90,17 @@ function hardFilterReasons(
     );
   }
 
+  // Unlike preferredBrands, this is always a hard filter — it exists
+  // specifically for cases a search term alone can't narrow down (e.g. a
+  // brand-scoped search returning that brand's entire product line).
+  if (preferences.requiredNameKeywords?.length) {
+    const missing = preferences.requiredNameKeywords.filter(
+      (keyword) => !offer.name.toLowerCase().includes(keyword.toLowerCase()),
+    );
+    if (missing.length > 0) {
+      reasons.push(`missing required keyword(s) in name: ${missing.join(', ')}`);
+    }
+  }
+
   return reasons;
 }

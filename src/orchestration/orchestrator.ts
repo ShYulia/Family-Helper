@@ -33,6 +33,11 @@ export async function runShoppingRun(
 
   for (const item of items.filter((candidate) => candidate.active)) {
     const candidates = await deps.productSearch.search(item.searchTerms);
+    // TEMP DEBUG (remove once the wrong-cart-contents issue is diagnosed):
+    console.log(
+      `[dry-run debug] item "${item.id}" (${item.label}, searchTerms=` +
+        `${JSON.stringify(item.searchTerms)}): ${candidates.length} unique candidate(s)`,
+    );
     const result = await deps.decisionEngine.decide({
       item,
       candidates,
@@ -40,11 +45,23 @@ export async function runShoppingRun(
     });
 
     if (result.status === 'decided') {
+      console.log(
+        `[dry-run debug]   DECIDED for "${item.id}": code=` +
+          `${result.decision.chosenOffer.siteProductId} name="${result.decision.chosenOffer.name}" ` +
+          `qty=${result.decision.quantityToBuy} score=${result.decision.score.toFixed(3)}`,
+      );
+      for (const line of result.decision.reasoning) {
+        console.log(`[dry-run debug]     reason: ${line}`);
+      }
       cartActions.push({
         siteProductId: result.decision.chosenOffer.siteProductId,
         quantity: result.decision.quantityToBuy,
+        expectedName: result.decision.chosenOffer.name,
       });
     } else {
+      console.log(
+        `[dry-run debug]   NO-MATCH for "${item.id}": ${result.reason}`,
+      );
       needsReview.push(result);
     }
   }

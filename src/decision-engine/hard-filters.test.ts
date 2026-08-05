@@ -56,6 +56,16 @@ describe('applyHardFilters', () => {
     expect(result.passed).toHaveLength(0);
   });
 
+  it('treats free-range as a hard requirement, rejecting a conventional offer as a substitute', () => {
+    const preferences: ItemPreferences = { dietary: ['free-range'] };
+    const result = applyHardFilters(preferences, [
+      offer({ dietaryTags: undefined }),
+      offer({ siteProductId: 'fr', dietaryTags: ['free-range'] }),
+    ]);
+    expect(result.passed.map((o) => o.siteProductId)).toEqual(['fr']);
+    expect(result.rejected[0]?.reasons[0]).toMatch(/free-range/);
+  });
+
   it('passes an offer over price but under a maxPrice ceiling', () => {
     const preferences: ItemPreferences = { maxPrice: 2 };
     const result = applyHardFilters(preferences, [offer({ price: 1.5 })]);
@@ -110,6 +120,31 @@ describe('applyHardFilters', () => {
       substitutionAllowed: false,
     };
     const result = applyHardFilters(preferences, [offer({ brand: 'Brand A' })]);
+    expect(result.passed).toHaveLength(1);
+  });
+
+  it('rejects an offer missing a required name keyword', () => {
+    const preferences: ItemPreferences = { requiredNameKeywords: ['שקדים'] };
+    const result = applyHardFilters(preferences, [
+      offer({ name: 'משקה סויה בריסטה לל"ס' }),
+    ]);
+    expect(result.passed).toHaveLength(0);
+    expect(result.rejected[0]?.reasons[0]).toMatch(/missing required keyword/);
+  });
+
+  it('passes an offer that contains all required name keywords', () => {
+    const preferences: ItemPreferences = { requiredNameKeywords: ['שקדים'] };
+    const result = applyHardFilters(preferences, [
+      offer({ name: 'משקה שקדים לל"ס' }),
+    ]);
+    expect(result.passed).toHaveLength(1);
+  });
+
+  it('is case-insensitive for required name keywords', () => {
+    const preferences: ItemPreferences = { requiredNameKeywords: ['Almond'] };
+    const result = applyHardFilters(preferences, [
+      offer({ name: 'Alpro almond milk' }),
+    ]);
     expect(result.passed).toHaveLength(1);
   });
 

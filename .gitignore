@@ -35,7 +35,13 @@ playwright-report/
 playwright/.cache/
 blob-report/
 
-# Household data (recurring lists, purchase history) — personal, not
-# architecture. The example file documents the shape and stays tracked.
+# Household data (recurring lists, purchase history, real site selectors)
+# — personal/site-identifying, not architecture. Example files document
+# the shape and stay tracked.
 /data/*
 !/data/recurring-items.example.json
+!/data/site-selectors.example.json
+
+# Browser session state (cookies, localStorage) — more sensitive than the
+# recurring list, never committed under any circumstance.
+auth-state.json

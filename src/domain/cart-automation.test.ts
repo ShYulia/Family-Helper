@@ -16,6 +16,16 @@ describe('cartActionSchema', () => {
       cartActionSchema.parse({ siteProductId: 'abc123', quantity: 0 }),
     ).toThrow();
   });
+
+  it('accepts an optional expectedName for post-action identity verification', () => {
+    expect(
+      cartActionSchema.parse({
+        siteProductId: 'abc123',
+        quantity: 2,
+        expectedName: 'Oat milk',
+      }),
+    ).toEqual({ siteProductId: 'abc123', quantity: 2, expectedName: 'Oat milk' });
+  });
 });
 
 describe('cartActionResultSchema', () => {

@@ -19,6 +19,9 @@ export const devDefaultWeights: DecisionWeights = {
   brandMatch: 1,
   packageSizeFit: 0.5,
   dietaryMatch: 1,
+  fatPercentageMatch: 1,
+  containerTypeMatch: 1,
+  sizeGradeMatch: 1,
 };
 
 export const devRecurringItems: RecurringItem[] = [

@@ -35,6 +35,32 @@ describe('productOfferSchema', () => {
       productOfferSchema.parse({ ...validOffer, fetchedAt: 'yesterday' }),
     ).toThrow();
   });
+
+  it('accepts optional fatPercentage/containerType/sizeGrade', () => {
+    const offer = {
+      ...validOffer,
+      fatPercentage: 3,
+      containerType: 'carton',
+      sizeGrade: 'M',
+    };
+    expect(productOfferSchema.parse(offer)).toMatchObject({
+      fatPercentage: 3,
+      containerType: 'carton',
+      sizeGrade: 'M',
+    });
+  });
+
+  it('rejects an out-of-range fatPercentage', () => {
+    expect(() =>
+      productOfferSchema.parse({ ...validOffer, fatPercentage: 101 }),
+    ).toThrow();
+  });
+
+  it('rejects an unknown containerType', () => {
+    expect(() =>
+      productOfferSchema.parse({ ...validOffer, containerType: 'box' }),
+    ).toThrow();
+  });
 });
 
 describe('promotionSchema', () => {

@@ -52,9 +52,19 @@ describe('itemPreferencesSchema', () => {
       maxPrice: 8,
       preferOnPromotion: true,
       substitutionAllowed: true,
+      preferredFatPercentage: 3,
+      preferredContainerType: 'carton',
+      preferredSizeGrade: 'M',
+      requiredNameKeywords: ['almond'],
       weights: { price: 3 },
     };
     expect(itemPreferencesSchema.parse(prefs)).toEqual(prefs);
+  });
+
+  it('rejects an out-of-range preferredFatPercentage', () => {
+    expect(() =>
+      itemPreferencesSchema.parse({ preferredFatPercentage: 101 }),
+    ).toThrow();
   });
 });
 
@@ -68,8 +78,26 @@ describe('decisionWeightsSchema', () => {
         brandMatch: 1,
         packageSizeFit: 1,
         dietaryMatch: 1,
+        fatPercentageMatch: 1,
+        containerTypeMatch: 1,
+        sizeGradeMatch: 1,
       }),
     ).toThrow();
+  });
+
+  it('accepts a fully populated set of weights, including the new factors', () => {
+    const weights = {
+      price: 1,
+      unitPrice: 1,
+      promotion: 1,
+      brandMatch: 1,
+      packageSizeFit: 1,
+      dietaryMatch: 1,
+      fatPercentageMatch: 1,
+      containerTypeMatch: 1,
+      sizeGradeMatch: 1,
+    };
+    expect(decisionWeightsSchema.parse(weights)).toEqual(weights);
   });
 });
 

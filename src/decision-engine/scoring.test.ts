@@ -26,6 +26,9 @@ const zeroWeights: DecisionWeights = {
   brandMatch: 0,
   packageSizeFit: 0,
   dietaryMatch: 0,
+  fatPercentageMatch: 0,
+  containerTypeMatch: 0,
+  sizeGradeMatch: 0,
 };
 
 describe('resolveWeights', () => {
@@ -223,6 +226,83 @@ describe('scoreCandidates — packageSizeFit', () => {
         preferences,
       ),
     ).toBe(0);
+  });
+});
+
+describe('scoreCandidates — fatPercentageMatch', () => {
+  it('omits fatPercentageMatch when no preferredFatPercentage is set', () => {
+    const scored = scoreCandidates(
+      [offer({ fatPercentage: 3 })],
+      {},
+      zeroWeights,
+    );
+    expect(
+      scored[0]?.factorScores.some((f) => f.factor === 'fatPercentageMatch'),
+    ).toBe(false);
+  });
+
+  it('scores 1 for an exact match and 0 otherwise', () => {
+    const preferences: ItemPreferences = { preferredFatPercentage: 3 };
+    const scored = scoreCandidates(
+      [offer({ fatPercentage: 3 }), offer({ fatPercentage: 1 })],
+      preferences,
+      zeroWeights,
+    );
+    const factorFor = (i: number) =>
+      scored[i]?.factorScores.find((f) => f.factor === 'fatPercentageMatch')
+        ?.normalizedScore;
+    expect(factorFor(0)).toBe(1);
+    expect(factorFor(1)).toBe(0);
+  });
+});
+
+describe('scoreCandidates — containerTypeMatch', () => {
+  it('omits containerTypeMatch when no preferredContainerType is set', () => {
+    const scored = scoreCandidates(
+      [offer({ containerType: 'carton' })],
+      {},
+      zeroWeights,
+    );
+    expect(
+      scored[0]?.factorScores.some((f) => f.factor === 'containerTypeMatch'),
+    ).toBe(false);
+  });
+
+  it('scores 1 for an exact match and 0 otherwise', () => {
+    const preferences: ItemPreferences = { preferredContainerType: 'carton' };
+    const scored = scoreCandidates(
+      [offer({ containerType: 'carton' }), offer({ containerType: 'bag' })],
+      preferences,
+      zeroWeights,
+    );
+    const factorFor = (i: number) =>
+      scored[i]?.factorScores.find((f) => f.factor === 'containerTypeMatch')
+        ?.normalizedScore;
+    expect(factorFor(0)).toBe(1);
+    expect(factorFor(1)).toBe(0);
+  });
+});
+
+describe('scoreCandidates — sizeGradeMatch', () => {
+  it('omits sizeGradeMatch when no preferredSizeGrade is set', () => {
+    const scored = scoreCandidates([offer({ sizeGrade: 'M' })], {}, zeroWeights);
+    expect(
+      scored[0]?.factorScores.some((f) => f.factor === 'sizeGradeMatch'),
+    ).toBe(false);
+  });
+
+  it('scores 1 for an exact match and 0 otherwise', () => {
+    const preferences: ItemPreferences = { preferredSizeGrade: 'M' };
+    const scored = scoreCandidates(
+      [offer({ sizeGrade: 'M' }), offer({ sizeGrade: 'L' })],
+      preferences,
+      zeroWeights,
+    );
+    const factorFor = (i: number) =>
+      scored[i]?.factorScores.find((f) => f.factor === 'sizeGradeMatch')
+        ?.normalizedScore;
+    expect(factorFor(0)).toBe(1);
+    expect(factorFor(1)).toBe(0);
   });
 });
 

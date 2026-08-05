@@ -3,19 +3,25 @@ import { z } from 'zod';
 /**
  * What: The one instruction the browser automation layer understands: add
  *   this exact product, in this quantity, to the cart.
- * Why: This is deliberately the *only* vocabulary the automation layer
- *   speaks. It contains no price, no brand, no preferences — by the time
- *   a CartAction exists, every decision has already been made upstream.
+ * Why: This is deliberately almost the *only* vocabulary the automation
+ *   layer speaks. It contains no price, no brand, no preferences — by the
+ *   time a CartAction exists, every decision has already been made
+ *   upstream. `expectedName` is the one exception: it carries the chosen
+ *   offer's name through purely as an identity check, so the automation
+ *   layer can confirm the page/element it's about to act on actually is
+ *   the product that was decided on, not a substitute for any scoring or
+ *   preference logic.
  * Layer: Execution — the boundary between Decision and the actual browser
  *   automation.
  * Who: Created by whatever orchestrates a shopping run, derived from a
  *   PurchaseDecision produced by the AI decision engine; consumed
  *   exclusively by the browser automation layer.
- * Example: { siteProductId: "abc123", quantity: 2 }.
+ * Example: { siteProductId: "abc123", quantity: 2, expectedName: "Oat milk" }.
  */
 export const cartActionSchema = z.object({
   siteProductId: z.string().min(1),
   quantity: z.number().int().positive(),
+  expectedName: z.string().min(1).optional(),
 });
 export type CartAction = z.infer<typeof cartActionSchema>;
 

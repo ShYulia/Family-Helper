@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  containerTypeSchema,
   dietaryTagSchema,
   prioritySchema,
   quantitySchema,
+  sizeGradeSchema,
   unitSchema,
 } from './shared.js';
 
@@ -45,7 +47,35 @@ describe('dietaryTagSchema', () => {
     expect(dietaryTagSchema.parse('organic')).toBe('organic');
   });
 
+  it('accepts free-range', () => {
+    expect(dietaryTagSchema.parse('free-range')).toBe('free-range');
+  });
+
+  it('accepts sugar-free', () => {
+    expect(dietaryTagSchema.parse('sugar-free')).toBe('sugar-free');
+  });
+
   it('rejects an unknown tag', () => {
     expect(() => dietaryTagSchema.parse('low-carb')).toThrow();
+  });
+});
+
+describe('containerTypeSchema', () => {
+  it('accepts a known container type', () => {
+    expect(containerTypeSchema.parse('carton')).toBe('carton');
+  });
+
+  it('rejects an unknown container type', () => {
+    expect(() => containerTypeSchema.parse('box')).toThrow();
+  });
+});
+
+describe('sizeGradeSchema', () => {
+  it('accepts a known size grade', () => {
+    expect(sizeGradeSchema.parse('M')).toBe('M');
+  });
+
+  it('rejects an unknown size grade', () => {
+    expect(() => sizeGradeSchema.parse('XXL')).toThrow();
   });
 });

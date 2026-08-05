@@ -42,6 +42,9 @@ const defaultWeights: DecisionWeights = {
   brandMatch: 1,
   packageSizeFit: 1,
   dietaryMatch: 1,
+  fatPercentageMatch: 1,
+  containerTypeMatch: 1,
+  sizeGradeMatch: 1,
 };
 
 describe('runShoppingRun', () => {
@@ -58,7 +61,9 @@ describe('runShoppingRun', () => {
       defaultWeights,
     });
 
-    expect(result.cartActions).toEqual([{ siteProductId: 'a', quantity: 2 }]);
+    expect(result.cartActions).toEqual([
+      { siteProductId: 'a', quantity: 2, expectedName: 'Oat milk' },
+    ]);
     expect(result.needsReview).toHaveLength(0);
   });
 
@@ -118,7 +123,7 @@ describe('runShoppingRun', () => {
     });
 
     expect(result.cartActions).toEqual([
-      { siteProductId: 'milk-a', quantity: 2 },
+      { siteProductId: 'milk-a', quantity: 2, expectedName: 'Oat milk' },
     ]);
     expect(result.needsReview).toHaveLength(1);
     expect(result.needsReview[0]).toMatchObject({ recurringItemId: 'eggs' });

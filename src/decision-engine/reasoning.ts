@@ -77,6 +77,12 @@ function describeFactor(
       return describePackageSizeFit(offer, preferences);
     case 'dietaryMatch':
       return describeDietaryMatch(offer, preferences);
+    case 'fatPercentageMatch':
+      return describeFatPercentageMatch(offer);
+    case 'containerTypeMatch':
+      return describeContainerTypeMatch(offer);
+    case 'sizeGradeMatch':
+      return describeSizeGradeMatch(offer);
   }
 }
 
@@ -145,6 +151,24 @@ function describeDietaryMatch(
     : 'matches your dietary preferences';
 }
 
+function describeFatPercentageMatch(offer: ProductOffer): string {
+  return offer.fatPercentage !== undefined
+    ? `matches your preferred fat percentage (${offer.fatPercentage}%)`
+    : 'matches your preferred fat percentage';
+}
+
+function describeContainerTypeMatch(offer: ProductOffer): string {
+  return offer.containerType
+    ? `matches your preferred packaging (${offer.containerType})`
+    : 'matches your preferred packaging';
+}
+
+function describeSizeGradeMatch(offer: ProductOffer): string {
+  return offer.sizeGrade
+    ? `matches your preferred size grade (${offer.sizeGrade})`
+    : 'matches your preferred size grade';
+}
+
 function percentCheaperThanAverage(
   value: number,
   others: number[],
@@ -168,6 +192,9 @@ function categorizeRejectionReason(reason: string): string {
   }
   if (reason.startsWith('missing required dietary')) {
     return 'none meet the required dietary tags';
+  }
+  if (reason.startsWith('missing required keyword')) {
+    return 'none match the required name keywords';
   }
   if (reason.includes('unit price') && reason.includes('exceeds maximum')) {
     return 'all exceed your per-unit price limit';

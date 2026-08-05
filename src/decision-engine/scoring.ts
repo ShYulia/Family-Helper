@@ -103,6 +103,33 @@ export function scoreCandidates(
       });
     }
 
+    if (preferences.preferredFatPercentage !== undefined) {
+      factorScores.push({
+        factor: 'fatPercentageMatch',
+        normalizedScore:
+          offer.fatPercentage === preferences.preferredFatPercentage ? 1 : 0,
+        weight: weights.fatPercentageMatch,
+      });
+    }
+
+    if (preferences.preferredContainerType) {
+      factorScores.push({
+        factor: 'containerTypeMatch',
+        normalizedScore:
+          offer.containerType === preferences.preferredContainerType ? 1 : 0,
+        weight: weights.containerTypeMatch,
+      });
+    }
+
+    if (preferences.preferredSizeGrade) {
+      factorScores.push({
+        factor: 'sizeGradeMatch',
+        normalizedScore:
+          offer.sizeGrade === preferences.preferredSizeGrade ? 1 : 0,
+        weight: weights.sizeGradeMatch,
+      });
+    }
+
     return {
       offer,
       score: weightedAverage(factorScores),

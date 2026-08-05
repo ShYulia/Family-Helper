@@ -40,6 +40,9 @@ const defaultWeights: DecisionWeights = {
   brandMatch: 1,
   packageSizeFit: 1,
   dietaryMatch: 1,
+  fatPercentageMatch: 1,
+  containerTypeMatch: 1,
+  sizeGradeMatch: 1,
 };
 
 describe('RuleBasedDecisionEngine — decided path', () => {

@@ -34,3 +34,8 @@ test-results/
 playwright-report/
 playwright/.cache/
 blob-report/
+
+# Household data (recurring lists, purchase history) — personal, not
+# architecture. The example file documents the shape and stays tracked.
+/data/*
+!/data/recurring-items.example.json

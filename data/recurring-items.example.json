@@ -1,0 +1,17 @@
+[
+  {
+    "id": "example-milk",
+    "label": "Milk",
+    "searchTerms": ["milk"],
+    "quantity": { "amount": 2, "unit": "l" },
+    "frequency": { "everyNDays": 7 },
+    "priority": "high",
+    "preferences": {
+      "preferredBrands": [],
+      "excludedBrands": [],
+      "dietary": [],
+      "substitutionAllowed": true
+    },
+    "active": true
+  }
+]
